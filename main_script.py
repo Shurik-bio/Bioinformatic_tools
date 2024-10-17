@@ -1,8 +1,22 @@
-from moduls.dna_rna_tools import reverse, transcribe, complement, reverse_complement
-from moduls.filter_fastq import gc_bounds, length_bounds, quality_threshold
-import string
+reverse, transcribe, complement, reverse_complement = import(absolute_path = '/home/shurik/HW4/modules').from('reverse', 'transcribe', 'complement', 'reverse_transcribe')
+gc_bounds, length_bounds, quality_threshold = import(absolute_path = '/home/shurik/HW4/modules').from('gc_bounds', 'length_bounds', 'quality_threshold')
 
-def run_dna_rna_tools(*args):
+import string
+from os import path
+from typing import Union
+
+path_fatsq = "/home/shurik/course_materials/Homeworks/HW5_Files/example_data"
+filename = "example_fastq.fastq"
+fullparth = os.path.join(path_fatsq, filename)
+
+
+dir_filt = os.mkdir('filtered')
+path_filt = "/home/shurik/course_materials/Homeworks/HW5_Files/example_data"
+filename_filt = "filtered_fastq.fastq"
+fullpath_to_filt = os.path.join(dir_filt, filename_filt)
+
+
+def run_dna_rna_tools(*args) -> str:
 """
     Applies a given function from the dna_rna_tools module to a variable number of sequences.
 
@@ -84,69 +98,52 @@ def run_dna_rna_tools(*args):
         else:
             return ' '.join(result)
 
-def filter_fastq(seqs: dict, length_bounds: int, gc_bounds: float, quality_threshold: float) -> dict:
+def filter_fastq(input_fastq, output_fastq, length_bounds: Union[int, tuple], gc_bounds: Union[int, tuple], quality_threshold: float) -> dict:
     """
-    Filter FASTQ records by one or more criteria.
+    Filter_fastq is a function which filters a fastq file based on GC%, length and quality thresholds
+    and writes the filtered sequences to a new fastq file.
 
-    Each criterion is given as a function, which takes a single FASTQ record
-    as argument and returns True or False. The functions are applied
-    sequentially, and a record is only passed through if all criteria return
-    True.
+    Parameters
+    ----------
+    input_fastq : str
+        A path to the input fastq file
+    output_fastq : str
+        A path to the output fastq file
+    gc_bounds : int or tuple
+        A tuple of integers representing GC% borders
+    length_bounds : int or tuple
+        A tuple of integers representing length borders
+    quality_threshold : float
+        A float representing a quality threshold
 
-    The following criteria are currently supported:
+     length_bounds() function: filters FASTQ records by length
+     gc_bounds() function: filters FASTQ records by GC%
+     quality_threshold() function: filters FASTQ records by quality
 
-    - `length_bounds`: a tuple of two integers, representing the minimum and
-      maximum length of the read
-
-      length_bounds() function: filters FASTQ records by length
-
-  Args:
-      x (int): the minimum length of the read
-      y (int): the maximum length of the read
-
-  Returns:
-      dict: Filtered FASTQ records by length
-
-    - `seqs`: a list of strings, representing sequence motifs to be searched
-      for
-    - `gc_bounds`: a tuple of two floats, representing the minimum and maximum
-
-      gc_bounds() function: calculates GC-content of the read and filters according to a given interval
-
-  Args:
-      x (float): the minimum GC content
-      y (float): the maximum GC content
-
-  Returns:
-      dict: Filtered FASTQ records 
-
-    - `quality_threshold`: a float, representing the minimum average basecall
-      quality of the read
-
-      Filters FASTQ records by quality average basecall quality of a read.
-    Receive the integer quality scores of a read and return the average quality for that read.
-
-  Args:
-      x (float): the minimum average basecall quality
-
-  Returns:
-      dict: filtered FASTQ records with given quality threshold
-
-    Returns a generator of filtered FASTQ records.
+    Returns
+    -------
+    output_fastq : dict
+        A dictionary where the keys are the header lines of the fastq file and
+        the values are tuples of sequences and quality strings, filtered based on
+        the GC%, length and quality thresholds
     """
-  passed_reads : dict = {}
-  for read in seqs.values():
-    sequence = length_bounds, gc_bounds
-    quality = quality_threshold
-    if sequence == length_bounds(sequence):
-      return length_bounds_filtred
-    elif sequence == gc_bounds(sequence):
-      return gc_bounds_filtred
-    elif quality == quality_threshold(quality):
-      return quality_filtered
-  for key, value in gc_bounds_filtred.items():
-    for key, value in length_filtered.items():
-      for key, value in quality_filtered.items():
-        if gc_bounds_filtred[key] == length_filtered[key] == quality_filtered[key]:
-          passed_reads[key] = value
-      return passed_reads
+    with open(fullparth, 'r', encoding="utf-8") as input_fastq, open(fullpath_to_filt, 'w', encoding="utf-8") as output_fastq:
+        fastq_seqs = {}
+        name_list = []
+        sequence_list = []
+        quality_list = []
+        for line in input_fastq:
+            if line.startswith('@'):
+                name_list.append(line)
+            elif not line.startswith('+') and not line.startswith('@'):
+                sequence_list.append(line)
+                quality_list.append(line)
+        for key, val1, val2 in zip(name_list, sequence_list, quality_list):
+            fastq_seqs[key] = val1, val2
+        
+        gc_bounds_filtred = gc_bounds(gc_borders)
+        length_bounds_filtred = length_bounds(length_borders)
+        quality_filtered = quality_threshold(quals)
+        
+        for key, val1, val2 in zip(name_list, length_bounds_filtred.values(), quality_filtered.values()):
+            output_fastq.write('@' + key + '\n' + val1 + '\n' + val2 + '\n')
