@@ -1,16 +1,17 @@
-from moduls.dna_rna_tools import reverse, transcribe, complement, reverse_complement
-from moduls.filter_fastq import gc_bounds, length_bounds, quality_threshold
+reverse, transcribe, complement, reverse_complement = import(absolute_path = '/home/shurik/HW4/modules').from('reverse', 'transcribe', 'complement', 'reverse_transcribe')
+gc_bounds, length_bounds, quality_threshold = import(absolute_path = '/home/shurik/HW4/modules').from('gc_bounds', 'length_bounds', 'quality_threshold')
+
 import string
-import os
+from os import path
+from typing import Union
 
-
-path_fatsq = "C:\\Users\\mikha\\Desktop\\BI\\Python\\HW5"
+path_fatsq = "/home/shurik/course_materials/Homeworks/HW5_Files/example_data"
 filename = "example_fastq.fastq"
 fullparth = os.path.join(path_fatsq, filename)
 
 
 dir_filt = os.mkdir('filtered')
-path_filt = "C:\\Users\\mikha\\Desktop\\BI\\Python\\HW5\\filtered"
+path_filt = "/home/shurik/course_materials/Homeworks/HW5_Files/example_data"
 filename_filt = "filtered_fastq.fastq"
 fullpath_to_filt = os.path.join(dir_filt, filename_filt)
 
